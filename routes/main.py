@@ -77,9 +77,9 @@ def dashboard():
     plan = api('/planner/plan', token=token)
     score_data = api('/ai/readiness', token=token)
 
-    days_left   = plan.get('days_left')
-    daily_plan  = plan.get('daily_plan', [])
-    topic_count = len(daily_plan)
+    days_left       = plan.get('days_left')
+    daily_plan      = plan.get('daily_plan', [])
+    topic_count     = len(daily_plan)
     readiness_score = score_data.get('readiness_score')
 
     return render_template('dashboard.html',
@@ -98,26 +98,24 @@ def planner():
         return redirect(url_for('main.login'))
     token = session['token']
 
-    plan_data = api('/planner/plan', token=token)
-    # Fetch topics for chip display (reuse plan data)
+    plan_data  = api('/planner/plan', token=token)
     topics_raw = plan_data.get('daily_plan', [])
-    topics = [type('T', (), {'name': t['topic']})() for t in topics_raw]
-
-    exam = None  # Extend later if you add a GET /planner/exam endpoint
+    topics     = [type('T', (), {'name': t['topic']})() for t in topics_raw]
 
     return render_template('planner.html',
         plan=plan_data if 'days_left' in plan_data else None,
         topics=topics,
-        exam=exam
+        exam=None
     )
 
 
-@main.route('/planner/exam', methods=['POST'])
+# renamed to /save-exam to avoid conflict with API /planner/exam
+@main.route('/save-exam', methods=['POST'])
 def add_exam():
     if not session.get('token'):
         return redirect(url_for('main.login'))
     r = api('/planner/exam', 'POST', {
-        'exam_date': request.form['exam_date'],
+        'exam_date':   request.form['exam_date'],
         'daily_hours': float(request.form['daily_hours'])
     }, token=session['token'])
     if r.get('exam_date'):
@@ -127,7 +125,8 @@ def add_exam():
     return redirect(url_for('main.planner'))
 
 
-@main.route('/planner/topic', methods=['POST'])
+# renamed to /save-topic to avoid conflict with API /planner/topic
+@main.route('/save-topic', methods=['POST'])
 def add_topic():
     if not session.get('token'):
         return redirect(url_for('main.login'))
@@ -150,22 +149,22 @@ def progress():
     from models import StudySession
     from flask_jwt_extended import decode_token
     try:
-        data = decode_token(session['token'])
-        user_id = data['sub']
+        data     = decode_token(session['token'])
+        user_id  = data['sub']
         sessions = StudySession.query.filter_by(user_id=user_id).all()
     except Exception:
         sessions = []
     return render_template('progress.html', sessions=sessions)
 
 
-@main.route('/progress/log', methods=['POST'])
+@main.route('/log-session', methods=['POST'])
 def log_session():
     if not session.get('token'):
         return redirect(url_for('main.login'))
     from models import db, StudySession
     from flask_jwt_extended import decode_token
     try:
-        data = decode_token(session['token'])
+        data    = decode_token(session['token'])
         user_id = data['sub']
         s = StudySession(
             actual_hours=float(request.form['actual_hours']),
@@ -174,7 +173,7 @@ def log_session():
         db.session.add(s)
         db.session.commit()
         flash('Session logged!', 'success')
-    except Exception as e:
+    except Exception:
         flash('Failed to log session.', 'error')
     return redirect(url_for('main.progress'))
 
@@ -185,6 +184,6 @@ def log_session():
 def ai_insights():
     if not session.get('token'):
         return redirect(url_for('main.login'))
-    r = api('/ai/readiness', token=session['token'])
+    r     = api('/ai/readiness', token=session['token'])
     score = r.get('readiness_score')
     return render_template('ai_insights.html', score=score)
