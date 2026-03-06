@@ -79,7 +79,7 @@ smart-learning-planner/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/smart-learning-planner.git
+git clone https://github.com/sujan011/smart-learning-planner.git
 cd smart-learning-planner
 ```
 
@@ -172,6 +172,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 👨‍💻 Author
 
-Built with ❤️ by **YOUR_NAME**
+Built with ❤️ by **SUJAN**
 
 > ⭐ If you found this helpful, please give it a star on GitHub!
+
