@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign In — StudyAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07070E; --card: #161622; --border: #252538;
+      --accent: #7C6FFF; --accent-lt: #9D93FF; --glow: rgba(124,111,255,0.2);
+      --green: #2EE89A; --red: #FF4F6E; --text: #E4E4F0; --muted: #606088;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+      background-image:
+        radial-gradient(ellipse 80% 60% at 20% -5%, rgba(124,111,255,0.14) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 105%, rgba(46,232,154,0.07) 0%, transparent 55%);
+    }
+    .box {
+      width: 100%; max-width: 420px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 48px 40px;
+      box-shadow: 0 40px 90px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,111,255,0.08);
+      animation: up 0.5s ease;
+    }
+    @keyframes up { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .logo {
+      font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-lt), var(--green));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .sub { color: var(--muted); font-size: 14px; margin-bottom: 36px; }
+    .field { margin-bottom: 17px; }
+    .field label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .field input {
+      width: 100%; padding: 13px 15px;
+      background: #0F0F1A; border: 1px solid var(--border);
+      border-radius: 11px; color: var(--text);
+      font-family: 'Outfit', sans-serif; font-size: 15px; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+    .btn {
+      width: 100%; padding: 14px; background: var(--accent); border: none;
+      border-radius: 11px; color: #fff;
+      font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: all 0.18s; margin-top: 6px;
+      box-shadow: 0 8px 24px var(--glow);
+    }
+    .btn:hover { background: var(--accent-lt); transform: translateY(-1px); }
+    .footer-link { text-align: center; margin-top: 22px; font-size: 14px; color: var(--muted); }
+    .footer-link a { color: var(--accent-lt); text-decoration: none; font-weight: 500; }
+    .footer-link a:hover { text-decoration: underline; }
+    .alert { padding: 11px 15px; border-radius: 10px; font-size: 14px; margin-bottom: 18px; }
+    .alert-error   { background: rgba(255,79,110,0.1); color: var(--red); border: 1px solid rgba(255,79,110,0.2); }
+    .alert-success { background: rgba(46,232,154,0.1); color: var(--green); border: 1px solid rgba(46,232,154,0.2); }
+  </style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">StudyAI ✦</div>
+  <div class="sub">Welcome back — sign in to your account</div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('main.login') }}">
+    <div class="field">
+      <label>Username</label>
+      <input type="text" name="username" placeholder="Enter your username" required autofocus/>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" name="password" placeholder="Enter your password" required/>
+    </div>
+    <button type="submit" class="btn">Sign In →</button>
+  </form>
+
+  <div class="footer-link">Don't have an account? <a href="{{ url_for('main.register') }}">Register here</a></div>
+</div>
+</body>
+</html>

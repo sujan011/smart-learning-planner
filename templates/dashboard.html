@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — StudyAI{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+  <div class="page-title">Dashboard</div>
+  <div class="page-sub">Welcome back, <strong>{{ session.get('username', 'Learner') }}</strong> — here's your study overview</div>
+</div>
+
+<!-- STAT CARDS -->
+<div class="grid-3 fade-in-2">
+  <div class="stat-card">
+    <div class="stat-label">Days Until Exam</div>
+    <div class="stat-value {% if days_left is not none %}{% if days_left <= 7 %}c-red{% elif days_left <= 14 %}c-gold{% else %}c-green{% endif %}{% else %}c-muted{% endif %}">
+      {{ days_left if days_left is not none else '—' }}<span class="stat-unit">days</span>
+    </div>
+    {% if days_left is not none %}
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: {{ [days_left / 90 * 100, 100] | min }}%"></div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Topics to Cover</div>
+    <div class="stat-value c-accent">
+      {{ topic_count if topic_count is not none else '—' }}<span class="stat-unit">topics</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">AI Readiness Score</div>
+    <div class="stat-value {% if readiness_score is not none %}{% if readiness_score >= 70 %}c-green{% elif readiness_score >= 40 %}c-gold{% else %}c-red{% endif %}{% endif %}">
+      {{ readiness_score if readiness_score is not none else '—' }}<span class="stat-unit">/ 100</span>
+    </div>
+  </div>
+</div>
+
+<!-- TODAY'S PLAN -->
+<div class="card fade-in-3">
+  <div class="card-title">📅 Today's Study Plan</div>
+  {% if daily_plan %}
+  <table class="data-table">
+    <thead>
+      <tr><th>Topic</th><th>Hours / Day</th></tr>
+    </thead>
+    <tbody>
+      {% for item in daily_plan %}
+      <tr>
+        <td>
+          <span class="badge">
+            <span class="dot" style="background: hsl({{ loop.index0 * 47 + 210 }}, 70%, 65%)"></span>
+            {{ item.topic }}
+          </span>
+        </td>
+        <td><span class="pill">{{ item.hours_per_day }}h</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📚</div>
+    <p>No plan yet. <a href="{{ url_for('main.planner') }}" style="color:var(--accent-lt)">Set up your exam →</a></p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- QUICK LINKS -->
+<div class="grid-2">
+  <a href="{{ url_for('main.planner') }}" style="text-decoration:none">
+    <div class="card" style="cursor:pointer; transition: transform 0.2s; border-color: rgba(124,111,255,0.25);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+      <div class="card-title">📅 Planner</div>
+      <p style="color:var(--muted); font-size:14px; line-height:1.6">Add your exam date, daily hours, and topics to generate your personalised study plan.</p>
+    </div>
+  </a>
+  <a href="{{ url_for('main.ai_insights') }}" style="text-decoration:none">
+    <div class="card" style="cursor:pointer; transition: transform 0.2s; border-color: rgba(46,232,154,0.2);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+      <div class="card-title">🎯 AI Readiness</div>
+      <p style="color:var(--muted); font-size:14px; line-height:1.6">See your predicted exam readiness score powered by your study session data.</p>
+    </div>
+  </a>
+</div>
+{% endblock %}

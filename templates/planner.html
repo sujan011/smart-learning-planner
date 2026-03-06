@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Planner — StudyAI{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+  <div class="page-title">Planner</div>
+  <div class="page-sub">Set your exam details and build your personalised study plan</div>
+</div>
+
+<div class="grid-2 fade-in-2">
+  <!-- EXAM SETUP -->
+  <div class="card">
+    <div class="card-title">🗓 Exam Setup</div>
+    <form method="POST" action="{{ url_for('main.add_exam') }}">
+      <div class="field">
+        <label>Exam Date</label>
+        <input type="date" name="exam_date" value="{{ exam.exam_date if exam else '' }}" required/>
+      </div>
+      <div class="field">
+        <label>Daily Study Hours</label>
+        <input type="number" name="daily_hours" min="0.5" max="24" step="0.5"
+               placeholder="e.g. 4" value="{{ exam.daily_hours if exam else '' }}" required/>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Save Exam</button>
+    </form>
+    {% if exam %}
+    <div class="alert alert-info" style="margin-top:16px; margin-bottom:0">
+      ✓ Exam set for <strong>{{ exam.exam_date }}</strong> — {{ exam.daily_hours }}h/day
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ADD TOPICS -->
+  <div class="card">
+    <div class="card-title">📖 Add Topics</div>
+    <form method="POST" action="{{ url_for('main.add_topic') }}">
+      <div class="form-row">
+        <div class="field">
+          <label>Topic Name</label>
+          <input type="text" name="name" placeholder="e.g. Calculus, Physics…" required/>
+        </div>
+        <button type="submit" class="btn btn-primary" style="flex-shrink:0">+ Add</button>
+      </div>
+    </form>
+
+    {% if topics %}
+    <div class="chip-list">
+      {% for topic in topics %}
+      <span class="chip"><span class="chip-check">✓</span>{{ topic.name }}</span>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="color:var(--muted); font-size:13px; margin-top:16px">No topics yet — add your first one above.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- CURRENT PLAN -->
+{% if plan %}
+<div class="card fade-in-3">
+  <div class="card-title">
+    📋 Your Study Plan
+    <span style="color:var(--muted); font-size:13px; font-weight:400">— {{ plan.days_left }} days left</span>
+  </div>
+  {% if plan.daily_plan %}
+  <table class="data-table">
+    <thead><tr><th>Topic</th><th>Hours / Day</th></tr></thead>
+    <tbody>
+      {% for item in plan.daily_plan %}
+      <tr>
+        <td>
+          <span class="badge">
+            <span class="dot" style="background: hsl({{ loop.index0 * 47 + 210 }}, 70%, 65%)"></span>
+            {{ item.topic }}
+          </span>
+        </td>
+        <td><span class="pill">{{ item.hours_per_day }}h</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📝</div>
+    <p>Add topics above to generate your plan.</p>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

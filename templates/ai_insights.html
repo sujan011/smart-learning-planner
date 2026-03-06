@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}AI Readiness — StudyAI{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+  <div class="page-title">AI Readiness</div>
+  <div class="page-sub">Your predicted exam readiness based on study data</div>
+</div>
+
+{% if score is not none %}
+{% set color = '#2EE89A' if score >= 70 else ('#F0C040' if score >= 40 else '#FF4F6E') %}
+{% set label = 'Exam Ready 🏆' if score >= 70 else ('Progressing 📈' if score >= 40 else 'Early Stage 🌱') %}
+{% set msg   = 'Strong preparation. Keep up your sessions and you're on track.' if score >= 70
+               else ('Building momentum. Log more sessions to push your score higher.' if score >= 40
+               else 'Start logging daily sessions — consistency is everything.') %}
+
+<!-- SCORE HERO -->
+<div class="card fade-in" style="text-align:center; padding: 52px 28px; margin-bottom:22px; border-color: {{ color }}33;">
+  <div class="ring-wrap" style="margin: 0 auto 28px;">
+    <svg width="150" height="150" viewBox="0 0 150 150">
+      {% set r = 58 %}
+      {% set circ = 2 * 3.14159 * r %}
+      {% set offset = circ - (score / 100) * circ %}
+      <circle cx="75" cy="75" r="{{ r }}" fill="none" stroke="#252538" stroke-width="11"/>
+      <circle cx="75" cy="75" r="{{ r }}" fill="none" stroke="{{ color }}" stroke-width="11"
+        stroke-dasharray="{{ circ }}" stroke-dashoffset="{{ offset }}"
+        stroke-linecap="round"/>
+    </svg>
+    <div class="ring-center">
+      <span class="ring-num" style="color:{{ color }}">{{ score }}</span>
+      <span class="ring-sub">/ 100</span>
+    </div>
+  </div>
+  <h2 style="font-family:'Syne',sans-serif; font-size:26px; color:{{ color }}; margin-bottom:10px">{{ label }}</h2>
+  <p style="color:var(--muted); max-width:420px; margin:0 auto; line-height:1.7; font-size:15px">{{ msg }}</p>
+</div>
+
+<!-- SCORE BREAKDOWN -->
+<div class="grid-3 fade-in-2">
+  <div class="stat-card">
+    <div class="stat-label">Hours Weight</div>
+    <div class="stat-value c-accent">40<span class="stat-unit">%</span></div>
+    <p style="color:var(--muted);font-size:13px;margin-top:10px">Based on total logged study hours</p>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Completion Weight</div>
+    <div class="stat-value c-gold">35<span class="stat-unit">%</span></div>
+    <p style="color:var(--muted);font-size:13px;margin-top:10px">Based on sessions completed</p>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Confidence Weight</div>
+    <div class="stat-value c-green">25<span class="stat-unit">%</span></div>
+    <p style="color:var(--muted);font-size:13px;margin-top:10px">Self-reported confidence level</p>
+  </div>
+</div>
+
+<!-- TIPS -->
+<div class="card fade-in-3">
+  <div class="card-title">💡 How to Improve Your Score</div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    {% for tip in [
+      'Log study sessions every day — even 1 hour counts.',
+      'Cover more topics to increase your completion rate.',
+      'Consistency over intensity: daily habits beat cramming.',
+      'Review weak areas before the exam for a confidence boost.'
+    ] %}
+    <div style="display:flex;gap:12px;align-items:flex-start;padding:13px 16px;background:var(--surface);border-radius:10px">
+      <span style="color:var(--accent);font-size:16px;flex-shrink:0;margin-top:1px">→</span>
+      <span style="font-size:14px">{{ tip }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% else %}
+<div class="card fade-in" style="text-align:center; padding: 64px 24px;">
+  <div class="empty-icon">🤖</div>
+  <h3 style="font-family:'Syne',sans-serif;font-size:22px;margin-bottom:10px">No Data Yet</h3>
+  <p style="color:var(--muted);margin-bottom:24px">Start logging study sessions to get your AI readiness score.</p>
+  <a href="{{ url_for('main.progress') }}" class="btn btn-primary" style="display:inline-flex">Log a Session →</a>
+</div>
+{% endif %}
+{% endblock %}

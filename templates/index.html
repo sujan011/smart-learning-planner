@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StudyAI — Your Intelligent Exam Companion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#07070E; --surface:#0F0F1A; --card:#161622; --border:#252538;
+      --accent:#7C6FFF; --alt:#9D93FF; --glow:rgba(124,111,255,0.22);
+      --green:#2EE89A; --gold:#F0C040; --text:#E4E4F0; --muted:#606088;
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      background:var(--bg); color:var(--text);
+      font-family:'Outfit',sans-serif; overflow-x:hidden;
+    }
+    body::before {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+      background:
+        radial-gradient(ellipse 80% 55% at 50% -10%, rgba(124,111,255,0.18) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 35% at 90% 80%,  rgba(46,232,154,0.08) 0%, transparent 55%);
+    }
+
+    /* NAV */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:20px 60px;
+      background:rgba(7,7,14,0.75); backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(37,37,56,0.5);
+    }
+    .brand {
+      font-family:'Syne',sans-serif; font-size:22px; font-weight:800;
+      background:linear-gradient(135deg,var(--alt),var(--green));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      text-decoration:none;
+    }
+    .nav-links { display:flex; gap:10px; align-items:center; }
+    .btn {
+      padding:10px 22px; border-radius:10px; font-size:14px; font-weight:500;
+      cursor:pointer; text-decoration:none; transition:all 0.18s;
+      font-family:'Outfit',sans-serif;
+    }
+    .btn-ghost { background:transparent; color:var(--muted); border:1px solid transparent; }
+    .btn-ghost:hover { color:var(--text); border-color:var(--border); }
+    .btn-solid { background:var(--accent); color:#fff; border:1px solid transparent; box-shadow:0 4px 18px var(--glow); }
+    .btn-solid:hover { background:var(--alt); transform:translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      position:relative; z-index:1;
+      min-height:100vh; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      text-align:center; padding:130px 24px 80px;
+    }
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 18px; border-radius:20px; font-size:13px; font-weight:500;
+      background:rgba(124,111,255,0.12); color:var(--alt);
+      border:1px solid rgba(124,111,255,0.25); margin-bottom:32px;
+      animation:up 0.6s ease both;
+    }
+    .bdot {
+      width:7px; height:7px; border-radius:50%;
+      background:var(--green); box-shadow:0 0 8px var(--green);
+      animation:pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+    .hero-title {
+      font-family:'Syne',sans-serif;
+      font-size:clamp(44px,7vw,82px); font-weight:800;
+      line-height:1.05; letter-spacing:-1.5px;
+      max-width:820px; margin-bottom:26px;
+      animation:up 0.6s 0.1s ease both;
+    }
+    .hl {
+      background:linear-gradient(135deg,var(--alt) 20%,var(--green) 80%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .hero-sub {
+      font-size:19px; color:var(--muted); line-height:1.65;
+      max-width:540px; margin-bottom:44px;
+      animation:up 0.6s 0.2s ease both;
+    }
+    .hero-cta {
+      display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+      animation:up 0.6s 0.3s ease both;
+    }
+    .cta-p {
+      padding:16px 36px; background:var(--accent); color:#fff;
+      border:none; border-radius:13px;
+      font-family:'Syne',sans-serif; font-size:16px; font-weight:700;
+      cursor:pointer; text-decoration:none;
+      box-shadow:0 8px 30px var(--glow); transition:all 0.2s;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .cta-p:hover { background:var(--alt); transform:translateY(-2px); }
+    .cta-s {
+      padding:16px 36px; background:transparent; color:var(--text);
+      border:1px solid var(--border); border-radius:13px;
+      font-family:'Outfit',sans-serif; font-size:16px; font-weight:500;
+      cursor:pointer; text-decoration:none; transition:all 0.2s;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .cta-s:hover { border-color:var(--accent); color:var(--alt); }
+
+    /* PREVIEW */
+    .preview-wrap {
+      position:relative; z-index:1; max-width:880px;
+      margin:80px auto 0; animation:up 0.6s 0.4s ease both;
+    }
+    .preview-glow {
+      position:absolute; inset:-50px;
+      background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(124,111,255,0.16) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .preview-box {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:20px; overflow:hidden;
+      box-shadow:0 40px 100px rgba(0,0,0,0.6);
+    }
+    .pbar {
+      background:var(--surface); padding:13px 18px;
+      display:flex; align-items:center; gap:7px;
+      border-bottom:1px solid var(--border);
+    }
+    .pdot { width:11px; height:11px; border-radius:50%; }
+    .purl {
+      flex:1; background:var(--card); border-radius:6px;
+      padding:5px 14px; font-size:12px; color:var(--muted);
+      margin:0 12px; text-align:center;
+    }
+    .pcontent { padding:24px; }
+    .pstats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
+    .ps {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:11px; padding:16px; position:relative; overflow:hidden;
+    }
+    .ps::after {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,var(--accent),var(--green));
+    }
+    .psl { font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:7px; }
+    .psv { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; }
+    .ptable { background:var(--surface); border:1px solid var(--border); border-radius:11px; overflow:hidden; }
+    .pth { display:grid; grid-template-columns:1fr auto; padding:9px 15px; border-bottom:1px solid var(--border); }
+    .pth span { font-size:10px; text-transform:uppercase; letter-spacing:0.09em; color:var(--muted); }
+    .ptr { display:grid; grid-template-columns:1fr auto; padding:10px 15px; border-bottom:1px solid rgba(37,37,56,0.45); align-items:center; }
+    .ptr:last-child { border-bottom:none; }
+    .ptopic { display:flex; align-items:center; gap:8px; font-size:13px; }
+    .td { width:7px; height:7px; border-radius:50%; }
+    .tpill { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:500; background:rgba(124,111,255,0.15); color:var(--alt); }
+
+    /* FEATURES */
+    .section { position:relative; z-index:1; padding:100px 60px; max-width:1100px; margin:0 auto; }
+    .slabel { font-size:12px; text-transform:uppercase; letter-spacing:0.12em; color:var(--accent); font-weight:600; margin-bottom:14px; }
+    .stitle { font-family:'Syne',sans-serif; font-size:clamp(30px,4vw,46px); font-weight:800; line-height:1.1; margin-bottom:14px; max-width:580px; }
+    .ssub { color:var(--muted); font-size:17px; line-height:1.65; max-width:500px; margin-bottom:56px; }
+
+    .fgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .fcard {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:18px; padding:28px; transition:transform 0.2s,border-color 0.2s;
+    }
+    .fcard:hover { transform:translateY(-3px); border-color:rgba(124,111,255,0.3); }
+    .ficon {
+      width:48px; height:48px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px; margin-bottom:16px;
+    }
+    .fi-p { background:rgba(124,111,255,0.15); }
+    .fi-g { background:rgba(46,232,154,0.12); }
+    .fi-o { background:rgba(240,192,64,0.12); }
+    .ftitle { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:9px; }
+    .fdesc  { color:var(--muted); font-size:14px; line-height:1.65; }
+
+    /* STEPS */
+    .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; position:relative; }
+    .steps::before {
+      content:''; position:absolute; top:27px; left:12%; right:12%; height:1px;
+      background:linear-gradient(90deg,transparent,var(--border),var(--border),transparent);
+    }
+    .step { text-align:center; padding:0 8px; }
+    .snum {
+      width:54px; height:54px; border-radius:50%;
+      background:var(--card); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Syne',sans-serif; font-size:17px; font-weight:800;
+      color:var(--alt); margin:0 auto 16px; position:relative; z-index:1;
+    }
+    .steptitle { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; margin-bottom:7px; }
+    .stepdesc  { color:var(--muted); font-size:13px; line-height:1.6; }
+
+    /* CTA BANNER */
+    .cta-banner {
+      position:relative; z-index:1; margin:0 60px 100px;
+      border-radius:24px; padding:72px 60px; text-align:center; overflow:hidden;
+      background:linear-gradient(135deg,rgba(124,111,255,0.18) 0%,rgba(46,232,154,0.08) 100%);
+      border:1px solid rgba(124,111,255,0.25);
+    }
+    .cta-banner::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(124,111,255,0.12) 0%,transparent 70%);
+    }
+    .cta-banner h2 {
+      font-family:'Syne',sans-serif; font-size:clamp(26px,4vw,42px);
+      font-weight:800; margin-bottom:14px; position:relative;
+    }
+    .cta-banner p { color:var(--muted); font-size:17px; margin-bottom:34px; position:relative; }
+
+    /* FOOTER */
+    footer {
+      position:relative; z-index:1; border-top:1px solid var(--border);
+      padding:30px 60px; display:flex; align-items:center; justify-content:space-between;
+      color:var(--muted); font-size:13px;
+    }
+    .fbrand {
+      font-family:'Syne',sans-serif; font-size:16px; font-weight:700;
+      background:linear-gradient(135deg,var(--alt),var(--green));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+
+    @keyframes up { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    @media(max-width:768px){
+      nav { padding:16px 20px; }
+      .section { padding:60px 24px; }
+      .fgrid, .steps { grid-template-columns:1fr 1fr; }
+      .cta-banner { margin:0 20px 60px; padding:48px 24px; }
+      footer { flex-direction:column; gap:10px; text-align:center; padding:24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="brand">StudyAI ✦</a>
+  <div class="nav-links">
+    <a href="{{ url_for('main.login') }}"    class="btn btn-ghost">Sign In</a>
+    <a href="{{ url_for('main.register') }}" class="btn btn-solid">Get Started Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span class="bdot"></span> AI-Powered Study Planning</div>
+
+  <h1 class="hero-title">
+    Study Smarter.<br/>Score <span class="hl">Higher.</span>
+  </h1>
+
+  <p class="hero-sub">
+    StudyAI builds your personalised exam plan, tracks your sessions,
+    and predicts your readiness — so you always know exactly where you stand.
+  </p>
+
+  <div class="hero-cta">
+    <a href="{{ url_for('main.register') }}" class="cta-p">Start for Free →</a>
+    <a href="{{ url_for('main.login') }}"    class="cta-s">Sign In</a>
+  </div>
+
+  <!-- MOCK DASHBOARD PREVIEW -->
+  <div class="preview-wrap">
+    <div class="preview-glow"></div>
+    <div class="preview-box">
+      <div class="pbar">
+        <div class="pdot" style="background:#FF5F57"></div>
+        <div class="pdot" style="background:#FFBD2E"></div>
+        <div class="pdot" style="background:#28C840"></div>
+        <div class="purl">studyai.app/dashboard</div>
+      </div>
+      <div class="pcontent">
+        <div class="pstats">
+          <div class="ps">
+            <div class="psl">Days Until Exam</div>
+            <div class="psv" style="color:#2EE89A">32<span style="font-size:13px;color:#606088;font-weight:400"> days</span></div>
+          </div>
+          <div class="ps">
+            <div class="psl">Topics to Cover</div>
+            <div class="psv" style="color:#9D93FF">5<span style="font-size:13px;color:#606088;font-weight:400"> topics</span></div>
+          </div>
+          <div class="ps">
+            <div class="psl">AI Readiness Score</div>
+            <div class="psv" style="color:#F0C040">68<span style="font-size:13px;color:#606088;font-weight:400"> /100</span></div>
+          </div>
+        </div>
+        <div class="ptable">
+          <div class="pth"><span>Topic</span><span>Hours / Day</span></div>
+          <div class="ptr"><div class="ptopic"><span class="td" style="background:#7C6FFF"></span>Calculus</div><div class="tpill">1.0h</div></div>
+          <div class="ptr"><div class="ptopic"><span class="td" style="background:#2EE89A"></span>Physics</div><div class="tpill">1.0h</div></div>
+          <div class="ptr"><div class="ptopic"><span class="td" style="background:#F0C040"></span>Chemistry</div><div class="tpill">1.0h</div></div>
+          <div class="ptr"><div class="ptopic"><span class="td" style="background:#FF6B9D"></span>English</div><div class="tpill">1.0h</div></div>
+          <div class="ptr"><div class="ptopic"><span class="td" style="background:#60A5FA"></span>History</div><div class="tpill">1.0h</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="slabel">Features</div>
+  <h2 class="stitle">Everything you need to ace your exam</h2>
+  <p class="ssub">From day one to exam day — StudyAI has every part of your preparation covered.</p>
+
+  <div class="fgrid">
+    <div class="fcard"><div class="ficon fi-p">📅</div><div class="ftitle">Smart Planner</div><div class="fdesc">Set your exam date, daily hours, and topics. Get a perfectly balanced daily plan generated instantly.</div></div>
+    <div class="fcard"><div class="ficon fi-g">📊</div><div class="ftitle">Progress Tracker</div><div class="fdesc">Log every study session and watch your total hours grow. See your consistency at a glance.</div></div>
+    <div class="fcard"><div class="ficon fi-o">🎯</div><div class="ftitle">AI Readiness Score</div><div class="fdesc">Our AI analyses your hours, completion rate, and confidence to predict exactly how ready you are.</div></div>
+    <div class="fcard"><div class="ficon fi-p">🗓</div><div class="ftitle">Daily Breakdown</div><div class="fdesc">Know exactly what to study each day — no guessing, no overwhelm, just a clear plan.</div></div>
+    <div class="fcard"><div class="ficon fi-g">🔐</div><div class="ftitle">Secure Accounts</div><div class="fdesc">Your data is protected with JWT authentication and hashed passwords — always safe.</div></div>
+    <div class="fcard"><div class="ficon fi-o">⚡</div><div class="ftitle">Instant Insights</div><div class="fdesc">Real-time score updates as you log sessions. Watch your readiness climb every single day.</div></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="padding-top:0">
+  <div class="slabel">How It Works</div>
+  <h2 class="stitle">Up and running in 4 steps</h2>
+  <p class="ssub" style="margin-bottom:52px">No complicated setup. Just sign up and start studying smarter.</p>
+
+  <div class="steps">
+    <div class="step"><div class="snum">01</div><div class="steptitle">Create Account</div><div class="stepdesc">Sign up in seconds with just a username and password.</div></div>
+    <div class="step"><div class="snum">02</div><div class="steptitle">Add Your Exam</div><div class="stepdesc">Enter your exam date and how many hours you can study daily.</div></div>
+    <div class="step"><div class="snum">03</div><div class="steptitle">Add Topics</div><div class="stepdesc">List all the subjects you need to cover before exam day.</div></div>
+    <div class="step"><div class="snum">04</div><div class="steptitle">Track & Score</div><div class="stepdesc">Log sessions daily and watch your AI readiness score rise.</div></div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+  <h2>Ready to start studying smarter?</h2>
+  <p>Join StudyAI today — it's free, fast, and built for exam success.</p>
+  <a href="{{ url_for('main.register') }}" class="cta-p" style="display:inline-flex; position:relative; z-index:1;">
+  Create Free Account →
+</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fbrand">StudyAI ✦</div>
+  <div>Built with Flask · SQLite · AI Readiness Engine</div>
+  <div>© 2026 StudyAI</div>
+</footer>
+
+</body>
+</html>

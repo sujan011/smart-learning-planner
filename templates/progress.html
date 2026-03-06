@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Progress — StudyAI{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+  <div class="page-title">Progress</div>
+  <div class="page-sub">Track your study sessions and monitor your growth</div>
+</div>
+
+<!-- LOG A SESSION -->
+<div class="card fade-in-2">
+  <div class="card-title">➕ Log Study Session</div>
+  <form method="POST" action="{{ url_for('main.log_session') }}">
+    <div class="grid-2" style="margin-bottom:0">
+      <div class="field" style="margin-bottom:0">
+        <label>Hours Studied</label>
+        <input type="number" name="actual_hours" min="0.5" max="24" step="0.5" placeholder="e.g. 2.5" required/>
+      </div>
+      <div style="display:flex; align-items:flex-end">
+        <button type="submit" class="btn btn-primary btn-full">Log Session</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- STATS -->
+<div class="grid-3 fade-in-2">
+  <div class="stat-card">
+    <div class="stat-label">Total Sessions</div>
+    <div class="stat-value c-accent">{{ sessions | length }}<span class="stat-unit">sessions</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Total Hours Studied</div>
+    <div class="stat-value c-green">
+      {{ "%.1f" | format(sessions | sum(attribute='actual_hours')) }}<span class="stat-unit">hrs</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Avg Hours / Session</div>
+    <div class="stat-value c-gold">
+      {% if sessions %}
+        {{ "%.1f" | format(sessions | sum(attribute='actual_hours') / sessions | length) }}
+      {% else %}0{% endif %}
+      <span class="stat-unit">hrs</span>
+    </div>
+  </div>
+</div>
+
+<!-- SESSION HISTORY -->
+<div class="card fade-in-3">
+  <div class="card-title">📋 Session History</div>
+  {% if sessions %}
+  <table class="data-table">
+    <thead><tr><th>#</th><th>Date</th><th>Hours Studied</th></tr></thead>
+    <tbody>
+      {% for s in sessions | reverse %}
+      <tr>
+        <td style="color:var(--muted)">{{ loop.index }}</td>
+        <td>{{ s.session_date }}</td>
+        <td><span class="pill">{{ s.actual_hours }}h</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📖</div>
+    <p>No sessions logged yet. Log your first session above!</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
