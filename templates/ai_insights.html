@@ -10,9 +10,9 @@
 {% if score is not none %}
 {% set color = '#2EE89A' if score >= 70 else ('#F0C040' if score >= 40 else '#FF4F6E') %}
 {% set label = 'Exam Ready 🏆' if score >= 70 else ('Progressing 📈' if score >= 40 else 'Early Stage 🌱') %}
-{% set msg   = 'Strong preparation. Keep up your sessions and you're on track.' if score >= 70
-               else ('Building momentum. Log more sessions to push your score higher.' if score >= 40
-               else 'Start logging daily sessions — consistency is everything.') %}
+{% set msg = "Strong preparation. Keep up your sessions and you are on track." if score >= 70
+             else ("Building momentum. Log more sessions to push your score higher." if score >= 40
+             else "Start logging daily sessions - consistency is everything.") %}
 
 <!-- SCORE HERO -->
 <div class="card fade-in" style="text-align:center; padding: 52px 28px; margin-bottom:22px; border-color: {{ color }}33;">
