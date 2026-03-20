@@ -2,6 +2,11 @@
 
 > An AI-powered exam preparation web app that builds your personalised study plan, tracks your sessions, and predicts your exam readiness.
 
+## 🌐 Live Demo
+
+👉 **[https://smart-learning-planner.onrender.com](https://smart-learning-planner.onrender.com)**
+
+
 ---
 
 ## 📸 Screenshots
@@ -175,4 +180,5 @@ This project is open source and available under the [MIT License](LICENSE).
 Built with ❤️ by **SUJAN**
 
 > ⭐ If you found this helpful, please give it a star on GitHub!
+
 
