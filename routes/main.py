@@ -34,29 +34,35 @@ def login():
     if session.get('token'):
         return redirect(url_for('main.dashboard'))
     if request.method == 'POST':
-        r = api('/auth/login', 'POST', {
-            'username': request.form['username'],
-            'password': request.form['password']
-        })
-        if r.get('access_token'):
-            session['token'] = r['access_token']
-            session['username'] = request.form['username']
+        from models import User
+        from werkzeug.security import check_password_hash
+        from flask_jwt_extended import create_access_token
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            session['token'] = create_access_token(identity=str(user.id))
+            session['username'] = username
             return redirect(url_for('main.dashboard'))
-        flash(r.get('msg', 'Login failed.'), 'error')
+        flash('Invalid credentials.', 'error')
     return render_template('login.html')
 
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        r = api('/auth/register', 'POST', {
-            'username': request.form['username'],
-            'password': request.form['password']
-        })
-        if r.get('msg') == 'User registered':
+        from models import db, User
+        from werkzeug.security import generate_password_hash
+        username = request.form['username']
+        password = request.form['password']
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists.', 'error')
+        else:
+            user = User(username=username, password=generate_password_hash(password))
+            db.session.add(user)
+            db.session.commit()
             flash('Account created! Please sign in.', 'success')
             return redirect(url_for('main.login'))
-        flash(r.get('msg', 'Registration failed.'), 'error')
     return render_template('register.html')
 
 
