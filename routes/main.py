@@ -3,7 +3,7 @@ import requests
 
 main = Blueprint('main', __name__)
 
-API = 'http://127.0.0.1:5000'
+API = 'https://smart-learning-planner.onrender.com'
 
 
 def api(path, method='GET', data=None, token=None):
